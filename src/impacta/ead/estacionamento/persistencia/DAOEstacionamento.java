@@ -11,6 +11,7 @@ import java.util.List;
 import impacta.ead.estacionamento.controle.EstacionamentoException;
 import impacta.ead.estacionamento.negocio.Movimentacao;
 import impacta.ead.estacionamento.negocio.Vaga;
+import impacta.ead.estacionamento.negocio.Veiculo;
 import impacta.ead.estacionamento.ultilitario.EstacionamentoUtil;
 
 public class DAOEstacionamento {
@@ -52,13 +53,68 @@ public class DAOEstacionamento {
 		}
 	}
 
-	public void atualizar(Movimentacao movimentacao) {
-		// TODO sus
+	public void atualizar(Movimentacao movimentacao) throws EstacionamentoException {
+		String cmd1 = EstacionamentoUtil.get("updateMov");
+		String cmd2 = EstacionamentoUtil.get("atualizaVaga");
+
+		Connection conexao =null;
+		try {
+			conexao = getConnection();
+			conexao.setAutoCommit(false);
+
+			// PARAMETROS DO VEICULO
+			PreparedStatement stmt = conexao.prepareStatement(cmd1);
+			stmt.setDouble(1, movimentacao.getValor());
+			stmt.setString(2, EstacionamentoUtil.getDataAsString(movimentacao.getDataHoraSaida()));
+			stmt.setString(3, movimentacao.getVeiculo().getPlaca());
+			
+
+			stmt.execute();
+
+			stmt = conexao.prepareStatement(cmd2);
+			stmt.setInt(1, Vaga.ocupadas() - 1);
+
+			stmt.execute();
+
+			conexao.commit();
+		} catch (SQLException e) {
+			try {
+				e.printStackTrace();
+				conexao.rollback();
+				throw new EstacionamentoException("ERRO ao registrar veiculo");
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			
+		}
 	}
 
 	public Movimentacao buscarMovimentacaoAberta(String placa) {
-		// TODO sus
-		return null;
+		String cmd = EstacionamentoUtil.get("getMovAberta");
+		
+		Connection conexao = null;
+		Movimentacao movimentacao=null;
+		try {
+			conexao = getConnection();
+			PreparedStatement ps = conexao.prepareStatement(cmd);
+			ps.setString(1, placa);
+			
+			ResultSet resultado= ps.executeQuery();
+			
+			if(resultado.next()) {
+				String rplaca = resultado.getString("placa");
+				String rdataEntrada = resultado.getString("data_entrada");
+				Veiculo veiculo = new Veiculo(rplaca);
+				 movimentacao= new Movimentacao(veiculo, EstacionamentoUtil.getDate(rdataEntrada));
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally{
+			closeConnection(conexao);
+		}
+		return movimentacao;
 	}
 
 	public List<Movimentacao> consultarMovimentacoes(LocalDateTime data) {

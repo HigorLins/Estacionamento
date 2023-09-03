@@ -1,5 +1,5 @@
-package impacta.ead.estacionamento.negocio;
 
+package impacta.ead.estacionamento.negocio;
 import impacta.ead.estacionamento.controle.EstacionamentoController;
 
 /**
@@ -66,6 +66,10 @@ public class Vaga {
 	
 	public static void entrou() {
 		Vaga.vagasOcupadas++;
+	}
+
+	public static void saiu() {
+		Vaga.vagasOcupadas--;
 	}
 	
 	

@@ -33,9 +33,28 @@ public class EstacionamentoController {
 		Vaga.entrou();
 
 	}
-	public Movimentacao processarSaida(String placa) {
-		//TODO SUS
-		return null;
+	public Movimentacao processarSaida(String placa) throws VeiculoException, EstacionamentoException {
+		//Validar a placa
+		if (!EstacionamentoUtil.ValidarPadraoPlaca(placa)) {
+			throw new VeiculoException("Placa Invalida!");
+		}
+		//Buscar  a movimentacao aberta baseada na placa
+		DAOEstacionamento dao = new DAOEstacionamento();
+		Movimentacao movimentacao = dao.buscarMovimentacaoAberta(placa);
+		
+		if(movimentacao == null) {
+			throw new EstacionamentoException("Veiculo não encontrado");
+		}
+		//fazer o calculo do valor a ser pago
+		movimentacao.setDataHoraSaida(LocalDateTime.now());//DATA DE SAIDA
+		EstacionamentoUtil.calcularValorPago(movimentacao);
+		//atualizar os dados da movimentacao
+		
+		dao.atualizar(movimentacao);
+		//atualizar o status da vaga
+		Vaga.saiu();
+		
+		return movimentacao;
 	}
 	public List<Movimentacao> emitirRelatorio(LocalDateTime data){
 		//TODO

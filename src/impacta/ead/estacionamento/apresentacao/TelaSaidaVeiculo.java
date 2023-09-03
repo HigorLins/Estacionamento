@@ -13,11 +13,14 @@ import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
 
 import impacta.ead.estacionamento.controle.EstacionamentoController;
+import impacta.ead.estacionamento.controle.EstacionamentoException;
+import impacta.ead.estacionamento.controle.VeiculoException;
 import impacta.ead.estacionamento.negocio.Movimentacao;
 
 public class TelaSaidaVeiculo extends JFrame implements ActionListener{
@@ -75,7 +78,12 @@ public class TelaSaidaVeiculo extends JFrame implements ActionListener{
 		//para a tela de pagamento
 		if(cmd.equals("ok")) {
 			EstacionamentoController controle = new EstacionamentoController();
-			Movimentacao movimentacao= controle.processarSaida(txtPlaca.getText());
+			Movimentacao movimentacao = null;
+			try {
+				movimentacao = controle.processarSaida(txtPlaca.getText());
+			} catch (VeiculoException | EstacionamentoException e) {
+				JOptionPane.showMessageDialog(null, e.getMessage(),"Falha na saida",JOptionPane.ERROR_MESSAGE);
+			}
 			TelaResumoPagamento telaResumo = new TelaResumoPagamento(movimentacao,parent);
 			telaResumo.setVisible(true);
 		}else {
