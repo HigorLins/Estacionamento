@@ -17,6 +17,61 @@ import javax.swing.JLabel;
 import impacta.ead.estacionamento.controle.EstacionamentoController;
 import impacta.ead.estacionamento.negocio.Movimentacao;
 
-public class TelaInicialRelatorio extends JFrame {
+public class TelaInicialRelatorio extends JFrame implements ActionListener {
+	
+	private JComboBox cboAno;
+	private JComboBox cboMes;
+	
+	
+	public TelaInicialRelatorio() {
+		getContentPane().setFont(new Font("Tahoma", Font.PLAIN, 14));
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(new Dimension(600,150));
+		
+		setEnabled(false);
+		setTitle("Filtro do Relátorio");
+		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 15, 40));
+		
+		JLabel lblAno = new JLabel("Ano:");
+		lblAno.setFont(new Font("Tahoma", Font.BOLD, 14));
+		getContentPane().add(lblAno);
+		
+		 cboAno = new JComboBox();
+		cboAno.setModel(new DefaultComboBoxModel(new String[] {"2023", "2022", "2021", "2020", "2019", "2018"}));
+		cboAno.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		getContentPane().add(cboAno);
+		
+		JLabel lblMes = new JLabel("Mês:");
+		lblMes.setFont(new Font("Tahoma", Font.BOLD, 14));
+		getContentPane().add(lblMes);
+		
+		 cboMes = new JComboBox();
+		cboMes.setModel(new DefaultComboBoxModel(new String[] {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"}));
+		cboMes.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		getContentPane().add(cboMes);
+		
+		JButton btnGerar = new JButton("Gerar");
+		btnGerar.addActionListener(this);
+		btnGerar.setFont(new Font("Tahoma", Font.BOLD, 14));
+		getContentPane().add(btnGerar);
+		
+		setLocationRelativeTo(null);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		//Recupera do combo o ano e mes escolhido
+		int ano =(Integer) cboAno.getSelectedItem();
+		int mes =(Integer) cboMes.getSelectedIndex()+1;
+		// Buscar as Movimentacoes do mes e ano informados
+		EstacionamentoController controle = new EstacionamentoController();
+		LocalDateTime data= LocalDateTime.of(ano,mes,1,0,0);
+		List<Movimentacao> movimentacoes = controle.emitirRelatorio(data);
+		//exibe a tela de conteudo e faturamento
+		TelaResultadoRelatorio relatorio = new TelaResultadoRelatorio(this,movimentacoes);
+		
+		relatorio.setVisible(true);
+		dispose();
+	}
 	
 }
