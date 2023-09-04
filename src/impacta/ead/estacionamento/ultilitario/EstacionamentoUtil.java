@@ -5,7 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,5 +94,21 @@ public class EstacionamentoUtil {
 	// TRANSFORMAR DATA BR
 	public static String getDisplayData(LocalDateTime data) {
 		return data.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+	}
+	public static String gerarTextoFaturamento(LocalDateTime data, List<Movimentacao> movimentacoes) {
+		double totalFaturado = 0;
+		String texto= "";
+		for(Movimentacao movimentacao : movimentacoes) {
+			totalFaturado += movimentacao.getValor();
+		}
+		
+		String sAno="" +data.getYear();
+		String sMes = data.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault());
+		
+		texto ="Faturamento do mês de" + sMes;
+		texto +="de"+sAno+"foi de R$"+ totalFaturado;
+		
+		
+		return texto;
 	}
 }

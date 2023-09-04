@@ -6,6 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
 
 import impacta.ead.estacionamento.controle.EstacionamentoException;
@@ -118,8 +121,44 @@ public class DAOEstacionamento {
 	}
 
 	public List<Movimentacao> consultarMovimentacoes(LocalDateTime data) {
-		// TODO SUS
-		return null;
+		Connection conexao= null;
+		String cmd = EstacionamentoUtil.get("selectMovRelatorio");
+		List<Movimentacao> movimentacoes = new ArrayList<>();
+
+		try {
+			 conexao = getConnection();
+				PreparedStatement ps = conexao.prepareStatement(cmd);
+				ps.setString(1, data.toString());
+				data = data.with(TemporalAdjusters.lastDayOfMonth());
+				ps.setString(2, data.toString());
+				
+				ResultSet resultado = ps.executeQuery();
+				while (resultado.next()) {
+					String placa = resultado.getString("placa");
+					LocalDateTime entrada = EstacionamentoUtil.getDate(resultado.getString("data_entrada"));
+					LocalDateTime saida = EstacionamentoUtil.getDate(resultado.getString("data_saida"));
+					double valor = resultado.getDouble("valor");
+					
+					Veiculo veiculo = new Veiculo(placa);
+					Movimentacao movimentacao= new Movimentacao(veiculo, entrada);
+					movimentacao.setDataHoraSaida(saida);
+					movimentacao.setValor(valor);
+					
+					movimentacoes.add(movimentacao);
+				}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			closeConnection(conexao);
+		}
+		
+		return movimentacoes;
+		
+		
+		
+		
+	
 	}
 
 	public Connection getConnection() throws SQLException {
@@ -168,3 +207,4 @@ public class DAOEstacionamento {
 	}
 
 }
+ 

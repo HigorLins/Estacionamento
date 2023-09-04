@@ -26,9 +26,9 @@ public class TelaInicialRelatorio extends JFrame implements ActionListener {
 	public TelaInicialRelatorio() {
 		getContentPane().setFont(new Font("Tahoma", Font.PLAIN, 14));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(new Dimension(600,150));
 		
-		setEnabled(false);
+		setSize(new Dimension(600,150));
+		setResizable(false);
 		setTitle("Filtro do Relátorio");
 		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 15, 40));
 		
@@ -36,7 +36,7 @@ public class TelaInicialRelatorio extends JFrame implements ActionListener {
 		lblAno.setFont(new Font("Tahoma", Font.BOLD, 14));
 		getContentPane().add(lblAno);
 		
-		 cboAno = new JComboBox();
+		cboAno = new JComboBox();
 		cboAno.setModel(new DefaultComboBoxModel(new String[] {"2023", "2022", "2021", "2020", "2019", "2018"}));
 		cboAno.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		getContentPane().add(cboAno);
@@ -61,14 +61,14 @@ public class TelaInicialRelatorio extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		//Recupera do combo o ano e mes escolhido
-		int ano =(Integer) cboAno.getSelectedItem();
+		int ano =Integer.parseInt((String) cboAno.getSelectedItem());
 		int mes =(Integer) cboMes.getSelectedIndex()+1;
 		// Buscar as Movimentacoes do mes e ano informados
 		EstacionamentoController controle = new EstacionamentoController();
 		LocalDateTime data= LocalDateTime.of(ano,mes,1,0,0);
 		List<Movimentacao> movimentacoes = controle.emitirRelatorio(data);
 		//exibe a tela de conteudo e faturamento
-		TelaResultadoRelatorio relatorio = new TelaResultadoRelatorio(this,movimentacoes);
+		TelaResultadoRelatorio relatorio = new TelaResultadoRelatorio(this,movimentacoes,data);
 		
 		relatorio.setVisible(true);
 		dispose();

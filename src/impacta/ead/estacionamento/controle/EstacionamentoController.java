@@ -57,8 +57,8 @@ public class EstacionamentoController {
 		return movimentacao;
 	}
 	public List<Movimentacao> emitirRelatorio(LocalDateTime data){
-		//TODO
-		return null;
+		DAOEstacionamento dao = new DAOEstacionamento();
+		return dao.consultarMovimentacoes(data);
 	}
 	public int inicializarOcuapadas() {
 		DAOEstacionamento dao = new DAOEstacionamento();
